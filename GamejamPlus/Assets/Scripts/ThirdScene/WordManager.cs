@@ -9,8 +9,10 @@ public class WordManager : MonoBehaviour
     [SerializeField] private TextMeshPro _realWord;
     [Space(2)]
     [SerializeField] private LetterButton[] _letters;
+    [SerializeField] private Collider2D _pcCollider;
 
     private string _mainWord = "relatorio";
+    private bool _canDigit = true;
 
     void Start()
     {
@@ -21,36 +23,20 @@ public class WordManager : MonoBehaviour
     {
         LetterButton.OnSendLetter += UpdateWord;
         EraseButton.OnEraseLetter += EraseLetter;
+        EnterButton.OnCheckWord += CheckWord;
     }
 
     private void OnDisable()
     {
         LetterButton.OnSendLetter -= UpdateWord;
         EraseButton.OnEraseLetter -= EraseLetter;
+        EnterButton.OnCheckWord -= CheckWord;
     }
 
     private void SetUpWord()
     {
         _placeholderWord.text = _mainWord;
         _realWord.text = "";
-
-        for (int i = 0; i < _letters.Length; i++)
-        {
-            _letters[i].DisableLetter();
-        }
-
-        char[] characters = _mainWord.ToCharArray();
-
-        for (int i = 0; i <_letters.Length; i++)
-        {
-            for(int y = 0; y < characters.Length; y++)
-            {
-                if (_letters[i].Letter == characters[y])
-                {
-                    _letters[i].EnableLetter();
-                }
-            }
-        }
     }
 
     private void EraseLetter()
@@ -73,25 +59,43 @@ public class WordManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
-            if (hit)
+            if (_canDigit)
             {
-                if (hit.collider.gameObject.GetComponent<LetterButton>())
+                RaycastHit2D hit = Physics2D.Raycast(Camera.main.ScreenToWorldPoint(Input.mousePosition), Vector2.zero);
+                if (hit)
                 {
-                    hit.collider.gameObject.GetComponent<LetterButton>().PrintLetter();
-                }
+                    if (hit.collider.gameObject.GetComponent<LetterButton>())
+                    {
+                        hit.collider.gameObject.GetComponent<LetterButton>().PrintLetter();
+                    }
 
-                if (hit.collider.gameObject.GetComponent<EraseButton>())
-                {
-                    hit.collider.gameObject.GetComponent<EraseButton>().ClickButton();
-                }
+                    if (hit.collider.gameObject.GetComponent<EraseButton>())
+                    {
+                        hit.collider.gameObject.GetComponent<EraseButton>().ClickButton();
+                    }
 
-                if (hit.collider.gameObject.GetComponent<EnterButton>())
-                {
-                    hit.collider.gameObject.GetComponent<EnterButton>().ClickButton();
-                }
+                    if (hit.collider.gameObject.GetComponent<EnterButton>())
+                    {
+                        hit.collider.gameObject.GetComponent<EnterButton>().ClickButton();
+                    }
 
+                }
             }
+        }
+    }
+
+    private void CheckWord()
+    {
+        if(_mainWord == _realWord.text)
+        {
+            Debug.Log("CERTO");
+            _canDigit = false;
+            _pcCollider.enabled = true;
+        }
+        else
+        {
+            _realWord.text = "";
+            _placeholderWord.gameObject.SetActive(true);
         }
     }
 }

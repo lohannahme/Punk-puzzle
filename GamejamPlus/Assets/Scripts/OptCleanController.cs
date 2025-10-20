@@ -4,10 +4,13 @@ public class ScratchController : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer _targetRenderer;
     [SerializeField] private Texture2D _brushTexture;
+    [SerializeField] private Collider2D _collider;
     private Texture2D _maskTexture;
     private Color32[] _originalPixels;
     private int _totalPixels;
     private int _clearedPixels;
+
+    private bool _isDirty = true;
 
     void Start()
     {
@@ -16,7 +19,10 @@ public class ScratchController : MonoBehaviour
 
     void Update()
     {
-        CleanMethod();
+        if (_isDirty)
+        {
+            CleanMethod();
+        }
     }
 
     void Erase(Vector2 pixelUV)
@@ -110,6 +116,8 @@ public class ScratchController : MonoBehaviour
         if(GetClearedPercent()> 0.9f)
         {
             _targetRenderer.gameObject.SetActive(false);
+            _isDirty = false;
+            _collider.enabled = true;
         }
     }
 }

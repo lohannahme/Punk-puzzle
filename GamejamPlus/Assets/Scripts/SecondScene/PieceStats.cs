@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +20,10 @@ public class PieceStats : MonoBehaviour
 
     private Vector3 _initialScale;
     private Vector3 _shadowPosition = new Vector3(.2f, -.2f, 0f);
+
+    private bool _hasPiece = true;
+
+    public static Action OnCorrectPiecePlaced;
 
     void Start()
     {
@@ -43,7 +48,9 @@ public class PieceStats : MonoBehaviour
     {
         if(_hold != null)
         {
+            _hasPiece = false;
             _hold.HoldHasAPiece();
+            OnCorrectPiecePlaced?.Invoke();
             this.gameObject.SetActive(false);
         }
         else
@@ -70,12 +77,15 @@ public class PieceStats : MonoBehaviour
     {
         if (collision.gameObject.GetComponent<PieceHold>() && collision.gameObject.GetComponent<PieceHold>().PieceHoldIndex == _pieceIndex)
         {
-            _hold.HasPiece = false;
-            _hold = null;
-            _pieceImage.transform.DOLocalMove(Vector3.zero, _timeToScale);
-            _pieceImage.transform.SetParent(this.gameObject.transform);
-            Debug.Log("exit right hold");
-            OnClick();
+            if (_hasPiece)
+            {
+                _hold.HasPiece = false;
+                _hold = null;
+                _pieceImage.transform.DOLocalMove(Vector3.zero, _timeToScale);
+                _pieceImage.transform.SetParent(this.gameObject.transform);
+                Debug.Log("exit right hold");
+                OnClick();
+            }
         }
     }
 }

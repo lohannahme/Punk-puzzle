@@ -4,9 +4,24 @@ using UnityEngine;
 
 public class DragObjects : MonoBehaviour
 {
+    [SerializeField] private int _totalPieces;
+    [SerializeField] private Collider2D _busCollider;
+
     private Transform _dragging = null;
     private Vector3 _offset;
     private PieceStats _currentPiece = null;
+    private int _currentPieces = 0;
+
+
+    private void OnEnable()
+    {
+        PieceStats.OnCorrectPiecePlaced += VerifyPieces;
+    }
+
+    private void OnDisable()
+    {
+        PieceStats.OnCorrectPiecePlaced -= VerifyPieces;
+    }
 
     void Update()
     {
@@ -21,7 +36,8 @@ public class DragObjects : MonoBehaviour
 
                 _offset = _dragging.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
             }
-        }else if (Input.GetMouseButtonUp(0))
+        }
+        else if (Input.GetMouseButtonUp(0))
         {
             if (_currentPiece)
             {
@@ -37,5 +53,14 @@ public class DragObjects : MonoBehaviour
             _dragging.position = Camera.main.ScreenToWorldPoint(Input.mousePosition) + _offset;
         }
         
+    }
+
+    private void VerifyPieces()
+    {
+        _currentPieces += 1;
+        if(_currentPieces == _totalPieces)
+        {
+            _busCollider.enabled = true;
+        }
     }
 }
