@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PieceStats : MonoBehaviour
+public class PieceStats : CursorChange
 {
     [SerializeField] private int _pieceIndex;
 
@@ -52,6 +52,7 @@ public class PieceStats : MonoBehaviour
             _hold.HoldHasAPiece();
             OnCorrectPiecePlaced?.Invoke();
             this.gameObject.SetActive(false);
+            base.MouseExitVirtual();
         }
         else
         {

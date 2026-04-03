@@ -1,16 +1,21 @@
+using System;
 using UnityEngine;
 
-public class ScratchController : MonoBehaviour
+public class ScratchController : CursorChange
 {
     [SerializeField] private SpriteRenderer _targetRenderer;
+
     [SerializeField] private Texture2D _brushTexture;
-    [SerializeField] private Collider2D _collider;
+
+    [SerializeField] private DrawPaperController _paperController;
+
     private Texture2D _maskTexture;
     private Color32[] _originalPixels;
     private int _totalPixels;
     private int _clearedPixels;
 
     private bool _isDirty = true;
+    private bool _isInCleaningArea = false;
 
     void Start()
     {
@@ -19,10 +24,30 @@ public class ScratchController : MonoBehaviour
 
     void Update()
     {
-        if (_isDirty)
+        if (_isDirty & _isInCleaningArea)
         {
             CleanMethod();
         }
+    }
+
+
+    protected override void MouseEnterVirtual()
+    {
+        if (_isDirty)
+        {
+            base.MouseEnterVirtual();
+            _isInCleaningArea = true;
+        }
+    }
+
+    protected override void MouseExitVirtual()
+    {
+        if (_isDirty)
+        {
+            base.MouseExitVirtual();
+            _isInCleaningArea = false;
+        }
+
     }
 
     void Erase(Vector2 pixelUV)
@@ -91,6 +116,16 @@ public class ScratchController : MonoBehaviour
             Erase(pixelUV);
             VerifyIfItsClean();
         }
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            SoundManager.PlayLoop(SoundType.MIRROR);
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            SoundManager.StopLoop();
+        }
     }
 
     Vector2 WorldToPixelCoordinates(Vector2 worldPos, SpriteRenderer renderer)
@@ -117,7 +152,9 @@ public class ScratchController : MonoBehaviour
         {
             _targetRenderer.gameObject.SetActive(false);
             _isDirty = false;
-            _collider.enabled = true;
+            base.MouseExitVirtual();
+            SoundManager.StopLoop();
+            _paperController.EnableDrawing();
         }
     }
 }

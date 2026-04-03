@@ -5,7 +5,7 @@ using UnityEngine;
 public class DragObjects : MonoBehaviour
 {
     [SerializeField] private int _totalPieces;
-    [SerializeField] private Collider2D _busCollider;
+    [SerializeField] private DrawPaperController _paperController;
 
     private Transform _dragging = null;
     private Vector3 _offset;
@@ -35,6 +35,7 @@ public class DragObjects : MonoBehaviour
                 _currentPiece.OnClick();
 
                 _offset = _dragging.position - Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                SoundManager.PlaySound(SoundType.GRABOBJECT);
             }
         }
         else if (Input.GetMouseButtonUp(0))
@@ -45,6 +46,7 @@ public class DragObjects : MonoBehaviour
                 _currentPiece.VerifyIfThePieceIsRight();
                 _dragging = null;
                 _currentPiece = null;
+                SoundManager.PlaySound(SoundType.DROPOBJECT);
             }
         }
 
@@ -60,7 +62,8 @@ public class DragObjects : MonoBehaviour
         _currentPieces += 1;
         if(_currentPieces == _totalPieces)
         {
-            _busCollider.enabled = true;
+            _paperController.EnableDrawing();
+            SoundManager.PlaySound(SoundType.BUS);
         }
     }
 }

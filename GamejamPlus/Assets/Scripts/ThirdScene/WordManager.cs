@@ -5,13 +5,14 @@ using TMPro;
 
 public class WordManager : MonoBehaviour
 {
-    [SerializeField] private TextMeshPro _placeholderWord;
+    //[SerializeField] private TextMeshPro _placeholderWord;
     [SerializeField] private TextMeshPro _realWord;
     [Space(2)]
     [SerializeField] private LetterButton[] _letters;
-    [SerializeField] private Collider2D _pcCollider;
+    [SerializeField] private DrawPaperController _drawPaper;
+    //[SerializeField] private Collider2D _pcCollider;
 
-    private string _mainWord = "relatorio";
+    private string _mainWord = "RELATORIO";
     private bool _canDigit = true;
 
     void Start()
@@ -35,7 +36,7 @@ public class WordManager : MonoBehaviour
 
     private void SetUpWord()
     {
-        _placeholderWord.text = _mainWord;
+        //_placeholderWord.text = _mainWord;
         _realWord.text = "";
     }
 
@@ -45,13 +46,14 @@ public class WordManager : MonoBehaviour
         _realWord.text = newString;
         if(_realWord.text == "")
         {
-            _placeholderWord.gameObject.SetActive(true);
+            //_placeholderWord.gameObject.SetActive(true);
         }
     }
 
     private void UpdateWord(char charletter)
     {
-        _placeholderWord.gameObject.SetActive(false);
+        //_placeholderWord.gameObject.SetActive(false);
+        SoundManager.PlaySound(SoundType.TYPING);
         _realWord.text += charletter;
     }
 
@@ -90,12 +92,15 @@ public class WordManager : MonoBehaviour
         {
             Debug.Log("CERTO");
             _canDigit = false;
-            _pcCollider.enabled = true;
+            SoundManager.PlaySound(SoundType.RIGHTWORD);
+            _drawPaper.EnableDrawing();
+            //_pcCollider.enabled = true;
         }
         else
         {
             _realWord.text = "";
-            _placeholderWord.gameObject.SetActive(true);
+            SoundManager.PlaySound(SoundType.WRONGWORD);
+            //_placeholderWord.gameObject.SetActive(true);
         }
     }
 }

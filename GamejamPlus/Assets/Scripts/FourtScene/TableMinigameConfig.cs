@@ -9,8 +9,11 @@ public class TableMinigameConfig : MonoBehaviour
 {
     [SerializeField] private GameObject _table;
     [SerializeField] private int _totalWords;
+    [SerializeField] private DrawPaperController _drawPaper;
 
-    private float _zoomTableScale = 0.92f;
+    [SerializeField] private WordStats[] _words;
+
+    private float _zoomTableScale = 0.84f;
     private Vector3 _initalTableScale;
 
     private Transform _dragging = null;
@@ -79,12 +82,18 @@ public class TableMinigameConfig : MonoBehaviour
 
     private void VerifyCorrectWords()
     {
+        Debug.Log("verify words");
         _currentWords += 1;
-        if(_currentWords == _totalWords)
+        if(_currentWords == _totalWords) 
         {
             _table.transform.DOScale(_initalTableScale, .5f).OnComplete(() =>
             {
-                OnFinishGame?.Invoke();
+                for (int i = 0; i < _words.Length; i++)
+                {
+                    _words[i].DiscardPapers();
+                }
+                _drawPaper.EnableDrawing();
+                //OnFinishGame?.Invoke();
             });
         }
     }
